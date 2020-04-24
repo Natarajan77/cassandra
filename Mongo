@@ -1,0 +1,692 @@
+Question 1: Skipped
+Which are valid read concerns in MongoDB? Check all answers that apply:
+​
+majority
+(Correct)
+​
+linearizable
+(Correct)
+​
+local
+(Correct)
+Explanation
+
+Correct Options: All choices are correct. majority read concern reads data that was written to a majority of nodes. local read concern reads data at least written to the primary. It is the default read concern linearizable read concern reads data written to a majority of nodes prior to the read request, and unlike majority will wait for pending write operations to complete that would modify the document(s) requested
+Question 2: Skipped
+You need to set up a replica set. Which command(s) do you need to run to set up the replica set and add 2 other nodes? Check all answers that apply:
+​
+rs.initiate(); rs.add(node2); rs.reconfig()
+​
+rs.initiate(); rs.add(node2); rs.add(node3);
+(Correct)
+​
+rs.add(node2); rs.add(node3); rs.initiate()
+Explanation
+
+Detailed Answer The correct answer is: rs.initiate(); rs.add(node2); rs.add(node3) rs.initiate() must be run first in order to initialize the replica set, and rs.reconfig() should only be run if you are modifying the replica configuration file directly.
+Question 3: Skipped
+Which command would you use to add an arbiter to an existing replica set on host mongo2, running on port 27017? Check all answers that apply:
+​
+rs.add("mongo2:27017, arb: true")
+​
+rs.addArb("mongo2:27107")
+(Correct)
+​
+rs.reconfig({"host": "mongo2", "port": 27017, "arbiter": "true"})
+Explanation
+
+This command will add the arbiter on mongo2:27107.
+Question 4: Skipped
+Before sharding a collection, by running the sh.shardCollection command in the mongo shell, which operation is required? Choose the best answer:
+​
+rename the collection
+​
+drop all data from the collection
+​
+remove all shard key duplicates
+​
+load data into the collection
+​
+create an index on the shard key
+(Correct)
+Explanation
+
+Before sharding a collection using sh.shardCollection command, the selected shard key needs to be supported by an index, therefore the correct answer is: create an index on the shard key All other operations are not necessary, or desired, to enable sharding in a collection.
+Question 5: Skipped
+Which is true of scatter gather queries? Check all answers that apply:
+​
+scatter gather queries can be triggered by using your shard key in your query predicates
+​
+the mongos has to go to each shard to check if the shard has the requested documents
+(Correct)
+​
+scatter gather queries are highly performant
+Explanation
+
+Incorrect Options: scatter gather queries can be triggered by using your shard key in your query predicates Using the shard key in your query predicates prevents scatter gather queries by routing the query to the correct shard. This is due to the config server being aware of the distribution of the values across the cluster. scatter gather queries are highly performant Scatter gather queries are not performant as the mongos has to go to each shard to check if the requested documents are present. Correct Option the mongos has to go to each shard to check if the shard has the requested documents Not querying on your shard key causes scatter gather queries. As a result, the mongos has no way of checking which shard the data resides on. This causes the mongos needs to route the query to each shard to gather the result set.
+Question 6: Skipped
+At which point does the balancer decide to start moving chunks from one shard to another? Check all answers that apply:
+​
+there has been a request to drain a shard due to a removeShard command
+(Correct)
+​
+zone sharding is used and some chunks are identified to be on the wrong shard
+(Correct)
+​
+when some shards have too many chunks compared to others
+(Correct)
+Explanation
+
+Correct Options: when some shards have too many chunks compared to others zone sharding is used and some chunks are identified to be on the wrong shard there has been a request to drain a shard due to a removeShard command All of these scenarios trigger a chunk migration.
+Question 7: Skipped
+Which of the following is the most important factor in choosing a shard key? Choose the best answer:
+​
+shard key that is not increasing/decreasing monotically
+​
+shard key for which the different values and their frequency are known
+​
+using more than one field for the shard key
+​
+knowledge of the approximate size of the collection to shard
+​
+knowledge of the read and write workloads of the application
+(Correct)
+Explanation
+
+Correct Answer: knowledge of the read and write workloads of the application This is the most important criteria. There is often no perfect shard key, so compromises may be needed. If the workload is mostly writes, not using a monotonically increasing/decreasing shard key and distributing the writes is crucial. If the workload is mostly reads, you want to identify the most frequent queries, and ensure those get distributed and localized. The queries not using the shard key will be sent to all shards. Those non-targeted queries do not scale well, meaning adding a new shard is not helping, so we want to minimize those.
+Question 8: Skipped
+When is it most beneficial to use a hashed shard key? Check all answers that apply:
+​
+for monotonically decreasing or increasing shard key values
+(Correct)
+​
+for fast sorts using the shard key
+​
+for geographically zoned sharding
+Explanation
+
+Detailed Answer The correct answer is: for a monotonically changing shard key All other answers are incorrect since a hashed shard key will not be able to support either geographically zoned sharding or fast sorts on the shard key.
+Question 9: Skipped
+You have the following operational requirements and benchmarks within your organization: Full backup or restore times can never exceed 20 minutes Client read and writes can never exceed 95 ms latency The current machines are provisioned with 16GB of RAM and 4TB disk space Backup and recovery times with 1.5TB took 15 minutes each, respectively The next available server size is 32GB RAM and 8TB disk space with a monthly cost increase of 10% for double the performance. The application is expected to grow in users and resource consumption at a rate of 7% monthly. Consider the following scenarios that represent different applications: Scenario A: Your replica set nodes are consuming 10% of available RAM and your database is 200GB, and a new law was passed in the EU requiring your organization to store certain data about EU customers within the EU. 66% of your users are location within the Americas with an average read and write response time of 90ms. Scenario B: Your replica set nodes are consuming 90% of available RAM and your database is 400GB Scenario C: Your replica set nodes are consuming 60% of a available RAM and your database is 2.8TB Select the scenario(s) above where sharding should be considered. Check all answers that apply:
+​
+A
+(Correct)
+​
+B
+​
+C
+(Correct)
+Explanation
+
+Detailed Answer The correct answers are scenarios A and C. Scenario C: While the cost of vertically scaling is acceptable, we're already using 2.8TB of disk space. Considering we benchmarked a backup operation and restore operation at 15 minutes each with 1.5TB of data, we're already beyond our SLAs. Sharding should have already been considered much sooner. Scenario A: This is a real world scenario that zone sharding was designed to address, and depending on the type of information your organization stores you may be subject to regulations requiring you to store data in a specific geographical area. Considering the majority of users are located in the Americas approaching SLA limits, sharding is more appropriate here than relocating all data to the EU. Let's discuss the incorrect answer. In scenario B, we're consuming 10% of available disk (400GB) and 90% of available RAM. This indicates quite an abundance of indexes for more performant reads. Based on benchmarks, backup and restore times are within acceptable SLAs and the cost to scale vertically is cheaper than the cost to scale horizontally. Based on the information provided, sharding is not appropriate in this scenario.
+Question 10: Skipped
+Consider the following aggregation pipeline: use services db.restaurants.aggregate([ { "$project": { "avgRating": { "$sum": "$reviews.rating" } } }, { "$out": "restaurants" } ]) If this pipeline is executed on a sharded collection, where can the $out stage be performed? Check all answers that apply:
+​
+The primary shard
+(Correct)
+​
+The mongos
+​
+A random shard
+Explanation
+
+Correct Option The primary shard The correct answer is the primary shard. This is because the $out stage must always be run on the primary shard for a sharded collection. All other answers are incorrect.
+Question 11: Skipped
+Consider the following chunk document: use config db.chunks.findOne() { "_id": "test.sessions-abc-yxz", "ns": "test.sessions", "min": { "userId": 1, "sessionId": "US00001" }, "max": { "userId": 10, "sessionId": "US00001" }, "shard": "sh-1", "lastmod": Timestamp(0,1), "lastmodEpoch": ObjectId("ac78f355843b62a6d5a33a76") } Which of the following statements is true regarding the above chunk? Check all answers that apply:
+​
+The shard key defined for "sessions" collection is {userId: 1, sessionId: 1}
+(Correct)
+​
+All documents in chunk "test.sessions-abc-yxz" are located in shard "sh-1"
+(Correct)
+​
+Documents with fields {"userId": 10, "sessionId": "US00001" } are located part of chunk "test.sessions-abc-yxz"
+Explanation
+
+Detailed Answer Incorrect Options: Documents with fields {"userId": 10, "sessionId": "US00001" } are located part of chunk "test.sessions-abc-yxz" This is incorrect because the documents defined with values {"userId": 10, "sessionId": "US00001" } match the upper bound of chunk "test.sessions-abc-yxz" and therefore are excluded from this chunk. Upper bound of a chunk is exclusive. Correct Options: The shard key defined for "sessions" collection is {userId: 1, sessionId: 1} All documents in chunk "test.sessions-abc-yxz" are located in shard "sh-1" Both options are correct. All documents of chunk "test.sessions-abc-yxz" are placed in the shard "sh-1" and the shard key of the collection is {userId: 1, sessionId: 1}, given that these are the fields defined in the sample chunk.
+Question 12: Skipped
+In order to store data in a sharded cluster in MongoDB, you must have: Check all answers that apply:
+​
+at least one shard
+(Correct)
+​
+config servers
+(Correct)
+​
+a mongos process
+(Correct)
+Explanation
+
+Detailed Answer All three of these options are true. In order to start a sharded cluster in MongoDB, you must have config servers, which will store chunk metadata and user information, a mongos process to route requests to the correct shards, and at least one shard to store data.
+Question 13: Skipped
+The config database in a sharded cluster contains information such as: Check all answers that apply:
+​
+Hints to improve the performance of sharded queries
+​
+The primary shard for a database
+(Correct)
+​
+The distribution of chunks and chunk boundaries
+(Correct)
+Explanation
+
+Detailed Answer The config database contains a lot of information, including which shard is the primary shard for a database and how information on chunk distribution and boundaries. It does not include performance hints.
+Question 14: Skipped
+Which of the following JSON documents contain syntax errors?
+​
+{ "name": "Jon Doe", "age": 10 }
+​
+{ "name age": ["Jon Doe", 10] }
+​
+{ "name", "Jon Doe", "age", 10 }
+(Correct)
+​
+{ "name": { "first": "Jon", "last": "Doe" }, "age": 10 }
+​
+{ "name": ["Jon", "Doe"], "age": [10] }
+Explanation
+
+JSON documents are composed of key-value pairs. Each key in a JSON document is followed by a : separator character before its corresponding value. In all of the other choices, each key is followed by a : character. In this example, there are no : characters, meaning there are no key-value pairs.
+Question 15: Skipped
+The $size operator is used to check the size of:
+​
+a chunk
+​
+a collection
+​
+an index
+​
+a database
+​
+an array field
+(Correct)
+Explanation
+
+An array field. The $size operator is used to return documents containing an array field with a specific size.
+Question 16: Skipped
+Consider the following query: db.toys.find({ "price": { "$gt": 20, "$lt": 100 }}) Which of the following documents could be returned by this query? Check all answers that apply:
+​
+{ "name": "yo-yo", "price": 18 }
+​
+{ "name": "dreidel", "price": 20 }
+​
+{ "name": "toy truck", "price": 50 }
+(Correct)
+Explanation
+
+This document will be returned, because 50 is less than 100 and greater than 20.
+Question 17: Skipped
+Consider the following query: db.people.find({ friends: "Mark Zuckerberg" }) Which of the following documents will be returned by this query? Check all answers that apply:
+​
+{ name: "Sheryl Sandberg", friends: "Mark Zuckerberg" }
+(Correct)
+​
+{ name: "Mark Zuckerberg", friends: [ "Sheryl Sandberg", "Sean Parker" ] }
+​
+{ name: "Sean Parker", friends: [ "Mark Zuckerberg", "Jack Dorsey" ] }
+(Correct)
+Explanation
+
+{ name: "Sean Parker", friends: [ "Mark Zuckerberg", "Jack Dorsey" ] } COPY This document will be returned, because the string "Mark Zuckerberg" is contained in the friends array. { name: "Sheryl Sandberg", friends: "Mark Zuckerberg" } COPY This document will be returned, because the string "Mark Zuckerberg" directly matches the string field friends.
+Question 18: Skipped
+When creating an index on a field with values of varying data types, how will the values be sorted in this index?
+​
+first ordered by value then by data type
+​
+only ordered by value
+​
+only ordered by data type
+​
+an index can not have different data types
+​
+first ordered by data type, then by value
+(Correct)
+Explanation
+
+Correct Answer: first ordered by datatype, then by value The indexed values are grouped based on the data type representation first, that way if we are traversing the tree, we can go directly to that branch of the tree and get results in a more streamlined fashion
+Question 19: Skipped
+Given a replica set and the following set of commands run from the secondary node (port 27003, node name: r3) of the replica set: use admin db.shutdownServer() What will be the result of the following shell command? mongod --port 27003 --dbpath /data/r3 --logpath /data/r3/r3.log --fork
+​
+r3 will get started and become part of the replica set again
+​
+r3 will become the primary node of the replica set
+​
+this command is invalid
+​
+this will restart the replica set with an additional node called r3
+​
+r3 will be run as a standalone node
+(Correct)
+Explanation
+
+The correct answer is r3 will be run as a standalone node This is because the command did not include the --replSet option, even though all other configurations stayed the same. All other answers are incorrect.
+Question 20: Skipped
+You issue the following query against our database: db.inventory.find( { "qty": { "$gte": 20 } } ) Which of the following commands will create an index that will cover the query? Check all answers that apply:
+​
+db.records.createIndex( { "qty": "sorted" } )
+​
+db.records.createIndex( { "qty": 1 } )
+(Correct)
+​
+db.records.createIndex( { "qty": "$range" } )
+Explanation
+
+Correct Option db.records.createIndex( { "qty": 1 } ) This will create an index on the "qty" field, which will cover the range query.
+Question 21: Skipped
+What is the principal reason why adding indexes may lead to slower write operations?
+​
+There are additional writes to disk to keep the indexes in sync with the data
+(Correct)
+​
+Index values can not be compressed as efficiently as BSON documents
+​
+MongoDB does not use Bloom filters for the indexes
+​
+They will take space in the working set kept in RAM
+​
+B-Trees are slow to traverse
+Explanation
+
+Correct Option: There are additional writes to disk to keep the indexes in sync with the data If you have 5 indexes, writing a new document will require 6 logical writes. However, don't let this drawback discourage you to create indexes, as running collection scan queries are likely going to impact more negatively your performance.
+Question 22: Skipped
+You have the following index on the products collection: { rating: 1, price: 1 } Which of the following choices would be a covered query?
+​
+db.products.find( { "price": { "$lt": 7 } }, { "_id": 0, "price": 1 } )
+​
+db.products.find( { "rating": { "$gte": 7 } }, { "price": 1 } )
+​
+db.products.find( { "rating": { "$gt": 7 } }, { "_id": 0, "price": 1 } )
+(Correct)
+​
+db.products.find( { "price": { "$lt": 7 }, "rating": 7 }, { "_id": 0 } )
+​
+db.products.find( { "price": { "$lt": 7 } }, { "_id": 0, "price": 1, "rating": 1 } )
+Explanation
+
+The correct answer is db.products.find( { "rating": { "$gt": 7 } }, { "_id": 0, "price": 1 } ) COPY This is because it's using the prefix rating, and projecting away all fields that aren't in the index. That only one key of the two is specified to be kept doesn't impact the query itself.
+Question 23: Skipped
+Consider the following commands run in the mongo shell: db.createCollection( "signs", { "collation": { "locale": "fr" } } ) db.signs.createIndex( { "sign_text": 1 }, { "collation": { "locale": "es" } } ) db.signs.find( { "sign_text": "Bonjour Québec" } ).collation( { "locale": "en" } ) Which of the following statements is true about the final .find() commmand?
+​
+mongod will match documents using the Spanish ("es") collation.
+​
+mongod will match documents using either the English ("en"), French ("fr"), or English ("en") collation.
+​
+mongod will match documents using the English ("en") collation.
+(Correct)
+​
+mongod will match documents using the French ("fr") collation.
+​
+mongod will throw an error.
+Explanation
+
+Detailed Answer Correct Option: mongod will match documents using the English ("en") collation. When you specify a collation to use with .find(), that is the collation that the query will use. Incorrect Options: mongod will match documents using the French ("fr") collation. The default collation specified on the collection is "fr", as can be seen in the .createCollection() call. If no collation had been specified to .find(), the French collation would have been used. mongod will match documents using the Spanish ("es") collation. An index was created on "sign_text" with the Spanish collation. If a query were issued on the "sign_text" field using the Spanish collation, this index would be used. Otherwise, this index will not be used. mongod will match documents using either the English ("en"), French ("fr"), or English ("en") collation. Only one collation can be used by a query. mongod will throw an error. Although different collations were used in collection creation, index creation, and the .find() command, no errors will be raised. Each of these collations will be used in varying ways as described in the previous explanations.
+Question 24: Skipped
+Which of the following would not be found in the combined results of explain() commands run on every shard?
+​
+the complete list of available indexes on each shard
+(Correct)
+​
+number of documents read on every shard
+​
+execution time of each stage on each shard
+​
+list of stages ran on the mongos
+​
+name of the index, or lack of it, chosen on each shard
+Explanation
+
+Correct Option: the complete list of available indexes on each shard You may see 2 or 3 alternate plans for a given query, however the output is not listing the whole list of available indexes, only those few that it thinks may be the best match. Run getIndexes() on your collection to see the complete list
+Question 25: Skipped
+Given this log message entry: 2019-01-08T11:41:01.661-0500 I COMMAND [conn1] command test.names appName: "MongoDB Shell" command: find { find: "names", filter: { _id: { $exists: 1.0 } }, $db: "test"} planSummary: IXSCAN { _id: 1 } cursorid:118472089469 keysExamined:101 docsExamined:101 numYields:0 nreturned:101 reslen:3822 locks:{ Global: { acquireCount: { r: 1 } }, Database: { acquireCount: { r: 1 } }, Collection: { acquireCount: { r: 1 } } } protocol:op_msg 0ms Which of the following are true?
+​
+The logged command was handled by connection [conn1]
+(Correct)
+​
+The message log level is INFORMATIONAL
+(Correct)
+​
+The logged component is a find command
+(Correct)
+Explanation
+
+All options are correct! Level is INFORMATIONAL This is reflected in the I value after the message timestamp information. 2019-01-08T11:41:01.661-0500 **I** COMMAND [conn1] command test.names... The logged component was a find command We can see that by looking into the component information, COMMAND, and the command description: **command**: find { find: "names", filter: { _id: { $exists: 1.0 } }, $db: "test"} The logged command was handled by connection [conn1] The connection information can be found as the forth information element in the log message: 2019-01-08T11:41:01.661-0500 I COMMAND **[conn1]**
+Question 26: Skipped
+Which of the following is true in respect of the command rs.config() Check all answers that apply:
+​
+Lists the nodes of all shard cluster replica sets
+​
+Lists the set of nodes of a replica set
+(Correct)
+​
+The command is executed in the context of a replica set
+(Correct)
+Explanation
+
+Detailed Answer **Correct Options:* Lists the set of nodes of a replica set rs.config() provides the current configuration of the replica set. The command is executed in the context of a replica set All mongo shell command helpers that start with rs are executed in the context of a replica set cluster. Incorrect Option: Lists the nodes of all shard cluster replica sets.
+Question 27: Skipped
+In the command below, what is the impact of the j: true setting? db.products.insert( { item: "envelopes", qty : 100, type: "A4" }, { writeConcern: { w: "majority" , j: true } } ) Check all answers that apply:
+​
+It enables journaling
+​
+You should never set j:true
+​
+It forces data to be synced to the journal before acknowledging a write
+(Correct)
+Explanation
+
+Detailed Answer Correct answer: Setting {j: true} forces data to be synced to disk before acknowledging a write operation. Be aware that this may have some performance impact while the operation waits for the journal commit. Incorrect answers: It enables journaling Enabling or disabling journaling is an operation done at the process level, not per operation. You should never set j:true j: true is a valid write concern option. With j: true, MongoDB returns only after the requested number of members, including the primary, have written to the journal.
+Question 28: Skipped
+Which command generates the following audit message? { "atype" : "createUser", "ts" : { "$date" : "2019-02-01T14:20:22.864-0500" }, "local" : { "ip" : "127.0.0.1", "port" : 30000 }, "remote" : { "ip" : "127.0.0.1", "port" : 64942 }, "users" : [], "roles" : [], "param" : { "user" : "god", "db" : "admin", "roles" : [ { "role" : "root", "db" : "admin" } ] }, "result" : 0 }
+​
+db.createUser({"user": "user1", "pwd": "yes", "roles": ["root"]})
+​
+db.createUser({"user": "god", "pwd": "yes", "roles": ["role": "readWrite", "db": "admin"]})
+​
+db.createUser({"user": "god", "pwd": "yes", "roles": ["root"]})
+(Correct)
+​
+db.auth("user1", "passwordOk")
+​
+db.auth("root", "yes")
+Explanation
+
+Detailed Answer Correct Option: db.createUser({user: 'god', pwd: 'yes', roles: ["root"]}) The audit message action type states the event was triggered by a successful createUser command. The param field determines that the user name is root and that the role granted is root. The above option is the only that matches all of these criteria. All other options are would generate a different audit message.
+Question 29: Skipped
+Let's assume an administrator created a user account with the following commands on a replica set with authorization turned on: $ mongo use foundation db.createUser({user: "daneel.olivaw", pwd: "etodemerzel", roles: ["readWrite"]}) Which of the following methods is not valid to authenticate this user?
+​
+$ mongo test --authenticationDatabase foundation > db.auth("daneel.olivaw", "etodemerzel")
+(Correct)
+​
+$ mongo > use foundation > db.auth("daneel.olivaw", "etodemerzel")
+​
+$ mongo foundation -u daneel.olivaw -p etodemerzel
+​
+$ mongo test > use foundation > db.auth("daneel.olivaw", "etodemerzel")
+​
+$ mongo test -u daneel.olivaw -p etodemerzel --authenticationDatabase foundation
+Explanation
+
+The correct answer is: $ mongo test --authenticationDatabase foundation > db.auth("daneel.olivaw", "etodemerzel") COPY This is the only commands that will not authenticate correctly. After the mongo shell starts, it will land in the 'test' directory. The subsequent db.auth() command will try to authenticate in this 'test' database, while it should do it in 'foundation' to succeed. The key thing to understand here is that --authenticationDatabase only make sense if you are also providing the credentials at the same time.
+Question 30: Skipped
+Which of the following statements are true? Check all answers that apply:
+​
+Kerberos can be used for internal authentication between nodes in a replica set
+​
+In keyfiles, a key's length must be between 6 and 1024 characters
+(Correct)
+​
+You can use X.509 to authenticate between nodes in a replica set
+(Correct)
+Explanation
+
+Detailed Answer The correct answers are: You can use X.509 to authenticate between nodes in a replica set In keyfiles, a key's length must be between 6 and 1024 characters Incorrect answers: Kerberos can be used for internal authentication between nodes in a replica set. Kerberos is not available for internal authentication and can only be used for client authentication to a mongod.
+Question 31: Skipped
+In a 3-node replica set, which of the following write concerns are more durable than the default? Check all answers that apply:
+​
+w: 0
+​
+w: 1
+​
+w: 2
+(Correct)
+Explanation
+
+Correct answers: w: 2 The default write concern is w: 1, and waiting for 2 nodes to apply a write is more durable than only waiting for 1 node to apply it.
+Question 32: Skipped
+You have the following information for the members field in your replicaset configuration document "members" : [ { "_id" : 0, "host" : "acmecorp:27017", "arbiterOnly" : false, "buildIndexes" : true, "hidden" : false, "priority" : 1, "tags" : { }, "slaveDelay" : NumberLong(0), "votes" : 1 }, { "_id" : 1, "host" : "acmecorp:27018", "arbiterOnly" : false, "buildIndexes" : true, "hidden" : true, "priority" : 0, "tags" : { }, "slaveDelay" : NumberLong(3600), "votes" : 0 }, { "_id" : 2, "host" : "acmecorp:27019", "arbiterOnly" : false, "buildIndexes" : true, "hidden" : false, "priority" : 1, "tags" : { }, "slaveDelay" : NumberLong(0), "votes" : 1 } ], Select the following true statements.
+​
+Member 1 can never become the primary
+(Correct)
+​
+Member 2 is more likely than member 0 to become primary
+​
+If member 0 or member 2 goes down, no new primary will be elected
+(Correct)
+Explanation
+
+Detailed Answer The correct answers are: If member 0 or member 2 goes down, no new primary will be elected This is because of the hidden node, member 1! Since it cannot vote, there would be no majority to elect a new primary if member 0 or member 2 goes down. An important consideration to keep in mind. Member 1 can never become the primary Because member 1 has a slaveDelay, it can never become the primary.
+Question 33: Skipped
+You have an application that does not need to have the most up to date data, however you want to ensure that network latency between your client application and the member it is reading from is minimized. Which read preference should you set to achieve this goal? Check all answers that apply:
+​
+secondary
+​
+nearest
+(Correct)
+​
+primaryPreferred
+Explanation
+
+Incorrect Options: primaryPreferred primaryPreferred Will read from a primary unless the primary is unavailable for any reason. In which case, the client will read from a secondary. Secondary Secondary Will always read from a secondary node. Correct Option nearest nearest is the correct answer as it will read from the node with the lowest network latency.
+Question 34: Skipped
+Consider the following custom role: db.getRole('readWriteAndDbAdmin') { "role": "readWriteAndDbAdmin", "db": "products", "isBuiltin": false, "roles": [ { "role": "readWrite", "db": "products" } ], "inheritedRoles": [ { "role": "readWrite", "db": "products" } ] } You are requested to grant new set of privileges to this role, so you run the following command: db.grantRolesToRole( "readWriteAndDbAdmin", [ { "role": "dbAdmin", "db": "products" } ] ) To check that the role now contains the expected privileges, you run this command: db.getRole("readWriteAndDbAdmin") What would be the expected output of this command ? Check all answers that apply:
+​
+{ "role": "readWriteAndDbAdmin", "db": "products", "isBuiltin": false, "roles": [ { "role": "readWrite", "db": "products" }, { "role": "dbAdmin", "db": "products" } ], "inheritedRoles": [ { "role": "dbAdmin", "db": "products" }, { "role": "readWrite", "db": "products" } ] }
+(Correct)
+​
+{ "role": "readWriteAndDbAdmin", "db": "products", "isBuiltin": false, "roles": [ { "role": "dbAdmin", "db": "products" } ], "inheritedRoles": [ { "role": "readWrite", "db": "products" } ] }
+​
+{ "role": "readWriteAndDbAdmin", "db": "products", "isBuiltin": false, "roles": [ { "role": "readWrite", "db": "products" } ], "inheritedRoles": [ { "role": "dbAdmin", "db": "products" } ] }
+Explanation
+
+After running all of the commands, the output of the getRole() command will be the following: { "role": "readWriteAndDbAdmin", "db": "products", "isBuiltin": false, "roles": [ { "role": "readWrite", "db": "products" }, { "role": "dbAdmin", "db": "products" } ], "inheritedRoles": [ { "role": "dbAdmin", "db": "products" }, { "role": "readWrite", "db": "products" } ] } COPY The other options contain incorrect inheritedRoles or roles.
+Question 35: Skipped
+Which of the following roles should you assign to a user to enable them to grant themselves any other role? Check all answers that apply:
+​
+dbOwner
+(Correct)
+​
+userAdmin
+(Correct)
+​
+__system
+Explanation
+
+The correct answers are dbOwner and userAdmin. These are super user roles. dbOwner inherits the userAdmin role, and the userAdmin role is commonly assigned to administrative users. The __system role is used by MongoDB in normal operations. It is not and should not be commonly assigned.
+Question 36: Skipped
+Which of the following is true in relation to the encrypted storage engine in MongoDB? Check all answers that apply:
+​
+Database keys are stored inside MongoDB
+(Correct)
+​
+Master keys are stored outside MongoDB
+(Correct)
+​
+Master keys are password protected
+​
+Database keys can be managed using KMIP
+Explanation
+
+Correct answers Master keys are stored outside MongoDB. This is true, we recommend that you use KMIP to manage these keys. Database keys are stored inside MongoDB. This is also true, there is a key per database stored inside MongoDB. Incorrect answers Database keys can be managed using KMIP. These keys cannot be managed using KMIP as they are stored inside MongoDB. Master keys are password protected. Master keys are not password protected.
+Question 37: Skipped
+Consider a write operation performed against a replica set with write concern w: 1. After changing the write concern to w: "majority", this operation is: Check all answers that apply:
+​
+more likely to take longer
+(Correct)
+​
+less likely to be rolled back
+(Correct)
+​
+more likely to block other operations in the application
+(Correct)
+Explanation
+
+Detailed Answer All three of these options are true. The write operation is more likely to take longer because the server has to wait for acknowledgement from a majority of nodes in the replica set. This typically takes longer than waiting for only one acknowledgement. It is also less likely to be rolled back, because even if the primary node shuts down, there is at least one other node that's applied the write operation. And finally, it is more likely to block other operations in the application, because the write operation will take longer than the same operation issued with write concern w: 1. However, this can be remedied by issuing a wtimeout that satisfies the application's need for timely acknowledgement.
+Question 38: Skipped
+Where do all non-sharded collections get stored in a sharded cluster?
+​
+In all primary shard nodes
+​
+In all secondaries shard nodes
+​
+mongos
+(Correct)
+​
+Config server
+​
+Primary shard
+Explanation
+
+Correct Answer: The config servers In a sharded cluster, the config servers store all user data used to authenticate to mongos.
+Question 39: Skipped
+How can you increase the cardinality of the shard key?
+​
+Use multiple shard keys.
+​
+Use a compound shard key.
+(Correct)
+​
+Increase the number of shards.
+​
+Create an index on the shard key.
+​
+Increase the number of chunks.
+Explanation
+
+Correct Answer: Use a compound shard key. Using a compound shard key creates more possibilities for the value of the shard key, by using each unique combination of all the fields in the key. Incorrect Answers: Use multiple shard keys. You cannot shard on multiple keys in a collection. Increase the number of shards. Adding more shards will decrease the load on each shard, but this will not increase the cardinality of the shard key. Increase the number of chunks. This will be a result of increasing the cardinality of the shard key, not a cause. Create an index on the shard key. It is already a requirement that the shard key has an index, therefore this will not increase the cardinality of the shard key.
+Question 40: Skipped
+What is sharding?
+​
+a method to ensure data availability
+​
+a way to vertically scale
+​
+a method of distributing data across multiple machines
+(Correct)
+Explanation
+
+The correct answer is: a method of distributing data across multiple machines a method to ensure data availability Is an incorrect answer. Replication is used to ensure data availability. a way to vertically scale Is an incorrect answer. Sharding is a way to horizontally scale when vertical scaling becomes either too costly or you reach a data size where backups and restores will become unmanagable for a single replica set. You can read more in the Sharding section of MongoDB documentation.
+Question 41: Skipped
+Given the following query: db.movies.find({"cast": "Meryl Streep"}).sort({"year":1}).skip(100).limit(20) And the following steps for executing such query in a sharded cluster: route - mongos send/route the query to the shards limit_by_shards - each shard limits to 100+20 docs on their partial result set limit_by_mongos - mongos limits to 20 docs skip_by_shards - each shard skips 100 docs on their partial result set skip_by_mongos - mongos skips of 100 docs sort_by_shards - each shard sorts their partial result set sort_by_mongos - mongos does a merge sort on the received documents Which of the following has the right steps, and in the right order?
+​
+route, skip_by_shard, limit_by_shard, sort_by_shard, skip_by_mongos, limit_by_mongos, sort_by_mongos
+​
+route, sort_by_shard, limit_by_shard, sort_by_mongos, skip_by_mongos, limit_by_mongos
+(Correct)
+​
+route, limit_by_shard, sort_by_mongos, limit_by_mongos, skip_by_mongos
+​
+route, sort_by_shard, skip_by_shard, limit_by_shard, sort_by_mongos, skip_by_mongos, limit_by_mongos
+​
+route, limit_by_shard, sort_by_mongos, skip_by_mongos, limit_by_mongos
+Explanation
+
+Correct Answer: route, sort_by_shard, limit_by_shard, sort_by_mongos, skip_by_mongos, limit_by_mongos Out of all the steps, the shards are not going to skip documents, because skipping the first X documents only make sense on the final result set. Remember the importance of having the shards responsible to sort their set, because they likely have an index to produce the ordered set. The mongos, a lighter process than the mongod, performs a merge sort, which is a rather inexpensive operation compare to a complete sort. The shards must limit to not only 20 documents, but also returned the potentially skipped documents. For this reason, they will limit to the sum of the limit() and skip() values.
+Question 42: Skipped
+Which of the following does MongoDB use to provide High Availability and fault tolerance?
+​
+Write Concern
+​
+Replication
+(Correct)
+​
+Sharding
+​
+Indexing
+Question 43: Skipped
+Which of the following does MongoDB use to provide High Scalability?
+​
+Write Concern
+​
+Replication
+​
+Sharding
+(Correct)
+​
+Indexing
+Question 44: Skipped
+Which of the following is a valid insert statement in mongodb? Select all valid.
+​
+db.test.insert({x:2,y:”apple”})
+(Correct)
+​
+db.test.push({x:2,y:”apple”})
+​
+db.test.insert({“x”:2, “y”:”apple”})
+(Correct)
+​
+db.test.insert({x:2},{y:”apple”})
+Question 45: Skipped
+Which of the following is true about aggregation framework?
+​
+A single aggregation framework operator can be used more than once in a query
+(Correct)
+​
+Each aggregation operator need to return atleast one of more documents as a result
+(Correct)
+​
+Pipeline expressions are stateless except accumulator expressions used with $group operator
+(Correct)
+​
+the aggregate command operates on a multiple collection
+Question 46: Skipped
+Below is a sample document in a given collection test. { a : 5, b : 3, c: 2, d : 1 } Given a compound index { a: 1, b:1, c:1, d:1}, Which of the below query will not use in-memory sorting? Select all valid.
+​
+db.test.find( { a: 5, b: 3 } ).sort( { a: 1, b: 1, c: 1 } )
+​
+db.test.find( { a: 5, b: 3 } ).sort( { a: 1} )
+​
+db.test.find( { a: 5, b: 3 } ).sort( {c: 1 } )
+(Correct)
+​
+db.test.find( { a: 5, b: 3 } ).sort( { c: 1, d : 1 } )
+(Correct)
+Question 47: Skipped
+In a replicated cluster, which of the following node would only be used during an election?
+​
+primary
+​
+secondary
+​
+arbiter
+(Correct)
+​
+hidden
+Question 48: Skipped
+What is the first task that a secondary would perform on being prompted by another secondary for an election?
+​
+Start the election process for primary
+​
+Connect to primary to confirm its availability
+(Correct)
+​
+Vote for the first secondary so that it would become the next primary
+​
+Vote for itself and then call for election
+Question 49: Skipped
+In which of the following scenarios is sharding not the correct option. Select all that apply.
+​
+The working set in the collection is expected to grow very large in size
+​
+The write operations on the collection are low
+(Correct)
+​
+The collection is a read intensive collection with less working set
+(Correct)
+​
+The write operations on the collection are very high
+Question 50: Skipped
+Which of the following collections stores authentication credentials in MongoDB?
+​
+system.users
+(Correct)
+​
+local.users
+​
+test.users
+​
+users.users
+Question 51: Skipped
+In a sharded cluster, from which node does one stop the balancer process before initiating backup?
+​
+Any node
+​
+mongos node
+(Correct)
+​
+config server node
+​
+replicaset primary node
+Continue
+Retake test
+
+
